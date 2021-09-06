@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.newthinktank.beans.Auteur;
-import com.newthinktank.beans.Noms;
 import com.newthinktank.beans.Utilisateur;
+import com.newthinktank.dao.DaoException;
+import com.newthinktank.dao.DaoFactory;
+import com.newthinktank.dao.UtilisateurDao;
 import com.newthinktank.forms.ConnectionForm;
 
 import jakarta.servlet.ServletException;
@@ -24,6 +26,7 @@ import jakarta.servlet.http.Part;
  */
 public class SampServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	 private UtilisateurDao utilisateurDao;
 	
 	public static final int TAILLE_TAMPON = 10240;
     public static final String CHEMIN_FICHIERS = "/home/adrien/Documents/OCR/java/javaEE/fichiers/"; // A changer
@@ -31,8 +34,14 @@ public class SampServlet extends HttpServlet {
     public SampServlet() {
         // TODO Auto-generated constructor stub
     }
+    
+    public void init() throws ServletException {
+        DaoFactory daoFactory = DaoFactory.getInstance();
+        this.utilisateurDao = daoFactory.getUtilisateurDao();
+    }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		/*
 		Auteur auteur = new Auteur();
 		auteur.setPrenom("Adrien");
 		auteur.setNom("Bessy");
@@ -47,10 +56,9 @@ public class SampServlet extends HttpServlet {
 		String[] titres = {"Nouvel incendie", "Pikachu", "Raichu"};
 		request.setAttribute("titres", titres);
 		
-		/*
 		HttpSession session = request.getSession();
 		String prenom = (String) session.getAttribute("prenom");
-		*/
+		
 		
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
@@ -63,7 +71,14 @@ public class SampServlet extends HttpServlet {
 		
 		Noms tableNoms = new Noms();
         request.setAttribute("utilisateurs", tableNoms.recupererUtilisateurs());
-		
+        */
+        
+		try {
+			request.setAttribute("utilisateurs", utilisateurDao.lister());
+		}
+		catch (DaoException e){
+			request.setAttribute("erreur", e.getMessage());
+		}
 		this.getServletContext().getRequestDispatcher("/WEB-INF/bonjour.jsp").forward(request, response);
 	}
 
@@ -97,17 +112,25 @@ public class SampServlet extends HttpServlet {
         }
         */
 		
+		try {
         Utilisateur utilisateur = new Utilisateur();
 		
         utilisateur.setNom(request.getParameter("nom"));
         utilisateur.setPrenom(request.getParameter("prenom"));  
+        utilisateurDao.ajouter(utilisateur);
         
+        request.setAttribute("utilisateurs", utilisateurDao.lister());
+		}
+        catch (Exception e) {
+            request.setAttribute("erreur", e.getMessage());
+        }
+        
+        /*
         Noms tableNoms = new Noms();
         tableNoms.ajouterUtilisateur(utilisateur);
         
         request.setAttribute("utilisateurs", tableNoms.recupererUtilisateurs());
         
-        /*
         HttpSession session = request.getSession();
         
         session.setAttribute("nom", nom);
