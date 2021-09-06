@@ -17,19 +17,20 @@
 			<c:out value= "${ pseudo }" /> 
         </p>
         
+ <!-- 
      <c:choose>
      	<c:when test="${ variable }">Du texte</c:when>
      	<c:when test="${ autreVariable }">Du texte</c:when>
      	<c:when test="${ encoreAutreVariable }">Du texte</c:when>
      	<c:otherwise>a</c:otherwise>
      </c:choose>
-     <!-- 
+     
      <c:forEach items="${ titres }" var="i" begin="0" end="1" varStatus="status">
      	 <p>
      	 	N°<c:out value="${ status.index }" /> : <c:out value="${ i }" /> !
     	 </p>
      </c:forEach>
-      -->
+      
       
      <c:forTokens var="morceau" items="Un élément/Un autre/encore un !" delims="/ ">
      	<p>${ morceau }</p>
@@ -62,6 +63,32 @@
         
         <input type="submit" />
     </form>
+    
+    
+    <c:out value="${ prenom }"></c:out>
+    <c:if test="${ !empty sessionScope.prenom && !empty sessionScope.nom }">
+        <p>Vous êtes ${ sessionScope.prenom } ${ sessionScope.nom } !</p>
+    </c:if>
+-->
+    
+    <form method="post" action="bonjour">
+        <p>
+            <label for="nom">Nom : </label>
+            <input type="text" name="nom" id="nom" />
+        </p>
+        <p>
+            <label for="prenom">Prénom : </label>
+            <input type="text" name="prenom" id="prenom" />
+        </p>
+        
+        <input type="submit" />
+    </form>
+    
+    <ul>
+        <c:forEach var="utilisateur" items="${ utilisateurs }">
+            <li><c:out value="${ utilisateur.prenom }" /> <c:out value="${ utilisateur.nom }" /></li>
+        </c:forEach>
+    </ul>    
      
     </body>
 </html>

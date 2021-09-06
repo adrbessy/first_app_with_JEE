@@ -7,12 +7,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.newthinktank.beans.Auteur;
+import com.newthinktank.beans.Noms;
+import com.newthinktank.beans.Utilisateur;
 import com.newthinktank.forms.ConnectionForm;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 /**
@@ -42,10 +46,29 @@ public class SampServlet extends HttpServlet {
 		
 		String[] titres = {"Nouvel incendie", "Pikachu", "Raichu"};
 		request.setAttribute("titres", titres);
+		
+		/*
+		HttpSession session = request.getSession();
+		String prenom = (String) session.getAttribute("prenom");
+		*/
+		
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("prenom")) {
+					request.setAttribute("prenom",cookie.getValue());
+				}
+			}
+		}
+		
+		Noms tableNoms = new Noms();
+        request.setAttribute("utilisateurs", tableNoms.recupererUtilisateurs());
+		
 		this.getServletContext().getRequestDispatcher("/WEB-INF/bonjour.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		/*
 		ConnectionForm connectionForm = new ConnectionForm();
 		connectionForm.verifierIdentifiants(request);
 		request.setAttribute("connectionForm", connectionForm);
@@ -72,6 +95,28 @@ public class SampServlet extends HttpServlet {
 
             request.setAttribute(nomChamp, nomFichier);
         }
+        */
+		
+        Utilisateur utilisateur = new Utilisateur();
+		
+        utilisateur.setNom(request.getParameter("nom"));
+        utilisateur.setPrenom(request.getParameter("prenom"));  
+        
+        Noms tableNoms = new Noms();
+        tableNoms.ajouterUtilisateur(utilisateur);
+        
+        request.setAttribute("utilisateurs", tableNoms.recupererUtilisateurs());
+        
+        /*
+        HttpSession session = request.getSession();
+        
+        session.setAttribute("nom", nom);
+        session.setAttribute("prenom", prenom);
+      
+        Cookie cookie = new Cookie("prenom",prenom);
+        cookie.setMaxAge(60 * 60 * 24 * 30);
+        response.addCookie(cookie);
+          */
 		
 		this.getServletContext().getRequestDispatcher("/WEB-INF/bonjour.jsp").forward(request, response);
 	}
